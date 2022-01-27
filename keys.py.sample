@@ -1,0 +1,6 @@
+iris_host=""
+iris_apikey=""
+iris_verify = False
+misp_apikey = ""
+misp_host = ""
+misp_verify = False
