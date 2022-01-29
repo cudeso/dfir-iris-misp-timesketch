@@ -1,0 +1,55 @@
+{
+	"name": "Vulnerability Exposure Analysis",
+    "tags":["Vulnerable","Vulnerable System"],
+	"customFields": {
+		"detectionMethod": {
+			"string": null,
+			"order": 2
+		},
+		"threatVector": {
+			"string": null,
+			"order": 3
+		},
+		"threatCategory": {
+			"string": null,
+			"order": 4
+		},
+		"dataExposure": {
+			"string": null,
+			"order": 1
+		}
+	},
+	"titlePrefix": "",
+	"tasks": [{
+		"title": "New vulnerability released or found",
+	    "description": "Pull in the notification details from OpenCVE",
+		"order": 0
+	}, {
+		"title": "Research vulnerability and exploits",
+	    "description": "Lookup shodan-asset-monitor details. Lookup internal asset inventory details",
+		"order": 1
+	}, {
+		"title": "Identify Qualys QID",
+		"order": 2
+	}, {
+		"title": "Identify externally Exposed resources",
+		"order": 3
+	}, {
+		"title": "Identify internal Vulnerable Systems and attach Results of Qualys Scan",
+		"order": 4
+	}, {
+		"title": "Send Internal Qualys Scan to Vulnerability Management Group",
+		"order": 5
+	}, {
+		"title": "Release to CIRT to identify mitigations - IPS signatures etc.",
+		"order": 6
+	}],
+	"description": "A new vulnerability or exploit is released",
+	"severity": 2,
+	"tlp": 2,
+	"status": "Ok",
+	"metrics": {
+		"# of External Vulnerable Systems Discovered": null,
+		"# of Internal Vulnerable Systems Discovered": null
+	}
+}
