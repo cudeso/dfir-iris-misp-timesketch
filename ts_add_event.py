@@ -34,7 +34,7 @@ def main():
 
     args = parser.parse_args()
     
-    add_sketch_event(args.sketch_id, "blah", args.timestamp, json.loads(args.attributes), json.loads(args.labels))
+    add_sketch_event(args.sketch_id, "Manually added event", args.timestamp, json.loads(args.attributes), json.loads(args.labels))
     print("Event added to sketch {}".format(args.sketch_id))
 
 if __name__ == "__main__":

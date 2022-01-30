@@ -13,7 +13,7 @@ import keys
 def add_iocs(cid, customer, iris_ioc, export_tag_misp):
 
     default_tlp_code = 2
-
+    ioc_count = 0
     misp_data=json.dumps({"returnFormat": "json", "tags": ["customer:{}".format(customer)],"to_ids":"1"})
     indicators=requests.post("{}/attributes/restSearch".format(misp_host), headers=misp_headers, data=misp_data, verify=misp_verify)
     response=indicators.json()["response"]["Attribute"]
@@ -33,7 +33,10 @@ def add_iocs(cid, customer, iris_ioc, export_tag_misp):
                     iris_attr_type = match_iris_ioc(iris_ioc, attr_type)
                     iris_data=json.dumps({"ioc_type_id": iris_attr_type, "ioc_tlp_id": default_tlp_code, "ioc_value": value, "ioc_description": "From MISP", "ioc_tags": ioc_tags, "cid": cid})
                     result = requests.post("{}/case/ioc/add".format(iris_host), headers=iris_headers, data=iris_data, verify=iris_verify)
-                    #print(result.text)        
+                    if "data" in result.json():
+                        ioc_count +=1 
+                    #print(result.text)
+    return ioc_count
 
 
 def get_ioc_types():
@@ -56,16 +59,17 @@ def main():
     import argparse
     parser = argparse.ArgumentParser(description="Add IOCs from MISP")
     parser.add_argument("cid", type=int, help="Case ID")
-    parser.add_argument("customer", type=str, help="Case ID")
+    parser.add_argument("customer", type=str, help="Customer tag (case sensitive")
     args = parser.parse_args()
 
     default_export_tag_misp = "export:iris"
 
     iris_ioc = get_ioc_types()
+    ioc_count = 0
     if iris_ioc:
-        add_iocs(args.cid, args.customer, iris_ioc, default_export_tag_misp)
+        ioc_count = add_iocs(args.cid, args.customer, iris_ioc, default_export_tag_misp)
         
-    print("IOCs for case {} added".format(args.cid))
+    print("{} IOC(s) for case {} added".format(ioc_count, args.cid))
 
 
 if __name__ == "__main__":

@@ -19,6 +19,7 @@ Scripts to integrate DFIR-IRIS, MISP and TimeSketch
 *  * Add MISP reports
 *  * Get text from to web pages
 * * Add IOCs
+* * * Tag the IOCs that need to be exported to IRIS with `export:iris`
 
 #### Custom taxonomy
 * Make sure you have a custom taxonomy (or custom tags) that consists of the "customer:<customer-name>". You can use another prefix but then you have to change the script(s).
@@ -102,6 +103,8 @@ As a third step import the asset lists you worked on. The asset list is stored i
 
 * Add assets to IRIS from a CSV file
 
+![irirs-add_assets.jpg](irirs-add_assets.jpg)
+
 ```
 (timesketch_api) user@timesketch:~/demo/scripts$ python iris_add_assets.py -h
 usage: iris_add_assets.py [-h] cid csv
@@ -120,14 +123,66 @@ Assets for case 12 added
 ```
 
 #### iris_add_evidence.py
+
+Next add the evidences to IRIS. This does not mean that the files are stored within IRIS, it just guarantees that you have a list of the evidences retrieved during the incident investigations.
+
+Note that IRIS can be extended with modules to automatically ingest some evidences ([https://github.com/dfir-iris/iris-evtx-module](https://github.com/dfir-iris/iris-evtx-module))
+
 * Add evidence to IRIS
+
+``` 
+(timesketch_api) user@timesketch:~/demo/scripts$ python iris_add_evidence.py -h
+usage: iris_add_evidence.py [-h] cid filename file_size file_hash file_description
+
+Add evidences to IRIS
+
+positional arguments:
+  cid               Case ID
+  filename          Evidence filename
+  file_size         Evidence file size
+  file_hash         Evidence file hash (SHA256)
+  file_description  Evidence file description
+
+optional arguments:
+  -h, --help        show this help message and exit
+(timesketch_api) user@timesketch:~/demo/scripts$ python iris_add_evidence.py 12 "demofile.zip" 92530 7532d8dedf2cbdc286075a76bd18119c9781fbd125f176fcdf187ecfe0a08c2f "ZIP file with O365 logs"
+Evidence demofile.zip for case 12 added
+(timesketch_api) user@timesketch:~/demo/scripts$
+```
+
+
+#### iris_add_iocs_misp.py
+
+Next, add the IOCs from MISP to IRIS. The list of IOCs comes from
+* tagging of the events with the customer name
+* tagging of attributes with export to IRIS
+* attribites with the to_ids flag
+* published event
+
+* Add IOCs from MISP to IRIS
+
+![iris-add_iocs_misp.jpg](iris-add_iocs_misp.jpg)
+
+```
+(timesketch_api) user@timesketch:~/demo/scripts$ python iris_add_iocs_misp.py -h
+usage: iris_add_iocs_misp.py [-h] cid customer
+
+Add IOCs from MISP
+
+positional arguments:
+  cid         Case ID
+  customer    Customer tag (case sensitive
+
+optional arguments:
+  -h, --help  show this help message and exit
+(timesketch_api) user@timesketch:~/demo/scripts$ python iris_add_iocs_misp.py 12 DEMO
+/home/user/timesketch_api/lib/python3.8/site-packages/urllib3/connectionpool.py:1043: InsecureRequestWarning: Unverified HTTPS request is being made to host 'misp-private.prod.cudeso.be'. Adding certificate verification is strongly advised. See: https://urllib3.readthedocs.io/en/1.26.x/advanced-usage.html#ssl-warnings
+  warnings.warn(
+1 IOC(s) for case 12 added
+```
 
 #### iris_get_from_ts.py
 * Get Timeline events from TimeSketch
-
-#### iris_add_iocs_misp.py
-* Add IOCs from MISP to IRIS
-
 
 
 #### iris_get_from_ts_savedsearch.py
@@ -138,23 +193,175 @@ Assets for case 12 added
 
 ### TimeSketch
 
-#### ts_import_pcap.py
-* Import PCAP file into TimeSketch 
-
-#### ts_ioc_iris_savedsearch.py
-* Create a saved search based on IOCs in an IRIS case
-
-#### ts_add_event.py
-* Manually add a TimeSketch event
-
-#### ts_ioc_misp_savedsearch.py
-* Create a saved search based on IOCs from a MISP event
 
 ##### ts_create_sketch.py
+
+Create a new TimeSketch sketch.
+
+![ts_create_sketch.jpg](ts_create_sketch.jpg)
+
 * Create a TimeSketch sketch
 
+```
+(timesketch_api) user@timesketch:~/demo/scripts$ python ts_create_sketch.py -h
+usage: ts_create_sketch.py [-h] name description
+
+Create a new TimeSketch
+
+positional arguments:
+  name         TimeSketch name
+  description  TimeSketch description
+
+optional arguments:
+  -h, --help   show this help message and exit
+(timesketch_api) user@timesketch:~/demo/scripts$ python ts_create_sketch.py "demo2022" "New demo 20202 sketch"
+Sketch 15 created
+```
+
+#### ts_import_pcap.py
+
+Import a PCAP file into a TimeSketch sketch. This import does not include all fields in a PCAP file but stores
+* IP Layer (IP source and destination)
+* IP protocol, flags, version and TTL
+* TCP/UDP Layer (source port and destination port)
+* TCP flags (short and long version)
+* ICMP type and code
+* DNS queries
+* HTTP fields (method, host, uri, user_agent)
+* Raw payload
+* If URLs (http) or DNS queries are foudn they are added as "url" / "domain" so that TimeSketch analyzer can pick them up
+
+![ts_import_pcap_1.jpg](ts_import_pcap_1.jpg)
+
+![ts_import_pcap_1.jpg](ts_import_pcap_2.jpg)
+
+![ts_import_pcap_1.jpg](ts_import_pcap_3.jpg)
+
+* Import PCAP file into TimeSketch 
+
+```
+(timesketch_api) user@timesketch:~/demo/scripts$ python ts_import_pcap.py -h
+usage: ts_import_pcap.py [-h] sketch_id pcap
+
+Import a PCAP file into TimeSketch.
+
+positional arguments:
+  sketch_id   Sketch ID of TimeSketch
+  pcap        Path to the pcapfile
+
+optional arguments:
+  -h, --help  show this help message and exit
+(timesketch_api) user@timesketch:~/demo/scripts$ python ts_import_pcap.py 15 ../data/2021-02-17-Trickbot-gtag-rob13-infection-in-AD-environment.pcap
+ts_import_pcap.py:40: DeprecationWarning: an integer is required (got type EDecimal).  Implicit conversion to integers using __int__ is deprecated, and may be removed in a future version of Python.
+  timestamp = datetime.datetime.utcfromtimestamp(packet.time).strftime("%Y-%m-%d %H:%M:%S.%f%z")
+```
+
 #### ts_import_evtx.py
+
+Import EVTX files into a TimeSketch sketch. This does not go through Plaso. Windows Event files are parsed and the XML content is added to TimeSketch.
+
+* Import EVTX file into TimeSketch
+
+```
+(timesketch_api) user@timesketch:~/demo/scripts$ python ts_import_evtx.py -h
+usage: ts_import_evtx.py [-h] sketch_id evtx
+
 Import EVTX file into TimeSketch
+
+positional arguments:
+  sketch_id   TimeSketch ID
+  evtx        Path to the Windows EVTX event log file
+
+optional arguments:
+  -h, --help  show this help message and exit
+(timesketch_api) user@timesketch:~/demo/scripts$ python ts_import_evtx.py 15 ../data/DE_RDP_Tunneling_4624.evtx
+18 records from EVTX imported into 18 records in TimeSketch
+```
+
+#### ts_add_event.py
+
+Manually add one event to a TimeSketch sketch
+
+* Manually add a TimeSketch event
+
+```
+(timesketch_api) user@timesketch:~/demo/scripts$ python ts_add_event.py -h
+usage: ts_add_event.py [-h] sketch_id timestamp attributes labels
+
+Add an event to a TimeSketch
+
+positional arguments:
+  sketch_id   TimeSketch ID
+  timestamp   Timestamp (ISO format)
+  attributes  Attributes to add
+  labels      Labels to add
+
+optional arguments:
+  -h, --help  show this help message and exit
+(timesketch_api) user@timesketch:~/demo/scripts$ python ts_add_event.py 15 "2022-01-31T12:00:00.0000" '{"Source":"demo-import"}' '[]'
+Event added to sketch 15
+```
+
+#### ts_ioc_misp_savedsearch.py
+
+Create a saved search based on tagged IOCs in a MISP event. Works similar as with transfering IOCs from MISP to IRIS.
+
+* tagging of the events with the customer name
+* tagging of attributes with export to TimeSketch `export:timesketch`
+* attribites with the to_ids flag
+* published event
+
+![ts_ioc_misp.jpg](ts_ioc_misp.jpg)
+
+* Create a saved search based on IOCs from a MISP event
+
+```
+(timesketch_api) user@timesketch:~/demo/scripts$ python ts_ioc_misp_savedsearch.py -h
+usage: ts_ioc_misp_savedsearch.py [-h] sketch_id return_fields customer
+
+Fetch events based on a label from TimeSketch and import into case
+
+positional arguments:
+  sketch_id      TimeSketch ID
+  return_fields  TimeSketch fields to return
+  customer       MISP customer tag
+
+optional arguments:
+  -h, --help     show this help message and exit
+(timesketch_api) user@timesketch:~/demo/scripts$ python ts_ioc_misp_savedsearch.py 15 "src_ip, dst_ip, url" DEMO
+/home/user/timesketch_api/lib/python3.8/site-packages/urllib3/connectionpool.py:1043: InsecureRequestWarning: Unverified HTTPS request is being made to host 'misp-private.prod.cudeso.be'. Adding certificate verification is strongly advised. See: https://urllib3.readthedocs.io/en/1.26.x/advanced-usage.html#ssl-warnings
+  warnings.warn(
+Save search for 64.188.19.241 added
+```
+
+#### ts_ioc_iris_savedsearch.py
+
+Create a saved search based on IOCs in an IRIS case.
+
+Warning! If IOCs are imported from MISP into IRIS and you already created a saved search based on the MISP IOCs, then there will be a second saved search based on the IOCs from IRIS. There's no check if a saved search already exists.
+
+* Create a saved search based on IOCs in an IRIS case
+
+```
+(timesketch_api) user@timesketch:~/demo/scripts$ python ts_ioc_iris_savedsearch.py -h
+usage: ts_ioc_iris_savedsearch.py [-h] sketch_id return_fields cid
+
+Create a saved search on basis of IOCs in IRIS
+
+positional arguments:
+  sketch_id      TimeSketch ID
+  return_fields  TimeSketch fields to return
+  cid            IRIS Case ID
+
+optional arguments:
+  -h, --help     show this help message and exit
+(timesketch_api) user@timesketch:~/demo/scripts$ python ts_ioc_iris_savedsearch.py 15 'src_ip, dst_ip, url' 12
+Save search for 64.188.19.241 added
+```
+
+
+
+
 
 # Elastic
 
