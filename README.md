@@ -3,6 +3,8 @@ Scripts to integrate DFIR-IRIS, MISP and TimeSketch
 
 ![dfir.drawio.png](/dfir.drawio.png)
 
+Also have a look at [Incident response case management, DFIR-IRIS and a bit of MISP](https://www.vanimpe.eu/2022/01/05/incident-response-case-management-dfir-iris-and-misp/)
+
 ## Usage and Scripts
 
 ### MISP
@@ -182,14 +184,105 @@ optional arguments:
 ```
 
 #### iris_get_from_ts.py
+
+Get events from a sketch in TimeSketch based on labels (tags) and add as timeline events to IRIS.
+
 * Get Timeline events from TimeSketch
 
+```
+(timesketch_api) user@timesketch:~/demo/scripts$ python iris_get_from_ts.py -h
+usage: iris_get_from_ts.py [-h] sketch_id label return_fields cid
+
+Fetch events based on a label from TimeSketch and import into case
+
+positional arguments:
+  sketch_id      TimeSketch ID
+  label          TimeSketch Label (chip
+  return_fields  TimeSketch Fields to return
+  cid            IRIS Case ID
+
+optional arguments:
+  -h, --help     show this help message and exit
+```
 
 #### iris_get_from_ts_savedsearch.py
+
+Get the events from a saved search in TimeSketch and import as events for the timeline feature of IRIS. Search the saved search by **name**.
+
+![iris_get_from_ts2.jpg](iris_get_from_ts2.jpg)
+
+![iris_get_from_ts1.jpg](iris_get_from_ts1.jpg)
+
+
 * Get timeline events from a Timesketch saved search
 
+```
+(timesketch_api) user@timesketch:~/demo/scripts$ python iris_get_from_ts_savedsearch.py -h
+usage: iris_get_from_ts_savedsearch.py [-h] sketch_id savedsearch return_fields cid
+
+Fetch events based on a saved search (name-based) from TimeSketch and import into case
+
+positional arguments:
+  sketch_id      TimeSketch ID
+  savedsearch    TimeSketch saved search name
+  return_fields  TimeSketch Fields to return
+  cid            IRIS Case ID
+
+optional arguments:
+  -h, --help     show this help message and exit
+(timesketch_api) user@timesketch:~/demo/scripts$ python iris_get_from_ts_savedsearch.py 15 "IOC search for 131.253.33.254 (MISP)" "src_ip, dst_ip, url" 12
+No description selected for search, saving without one
+Adding events to timeline 10.2.17.101:49729->131.253.33.254:443
+Adding events to timeline 131.253.33.254:443->10.2.17.101:49729
+Adding events to timeline 10.2.17.101:49729->131.253.33.254:443
+Adding events to timeline 10.2.17.101:49729->131.253.33.254:443
+Adding events to timeline 131.253.33.254:443->10.2.17.101:49729
+Adding events to timeline 131.253.33.254:443->10.2.17.101:49729
+Adding events to timeline 10.2.17.101:49729->131.253.33.254:443
+Adding events to timeline 131.253.33.254:443->10.2.17.101:49729
+Adding events to timeline 10.2.17.101:49729->131.253.33.254:443
+Adding events to timeline 131.253.33.254:443->10.2.17.101:49729
+Adding events to timeline 10.2.17.101:49729->131.253.33.254:443
+Adding events to timeline 131.253.33.254:443->10.2.17.101:49729
+Adding events to timeline 10.2.17.101:49729->131.253.33.254:443
+Adding events to timeline 10.2.17.101:49729->131.253.33.254:443
+Adding events to timeline 131.253.33.254:443->10.2.17.101:49729
+Adding events to timeline 10.2.17.101:49729->131.253.33.254:443
+Adding events to timeline 131.253.33.254:443->10.2.17.101:49729
+Adding events to timeline 131.253.33.254:443->10.2.17.101:49729
+Adding events to timeline 10.2.17.101:49729->131.253.33.254:443
+Adding events to timeline 131.253.33.254:443->10.2.17.101:49729
+Adding events to timeline 10.2.17.101:49729->131.253.33.254:443
+Adding events to timeline 10.2.17.101:49729->131.253.33.254:443
+Adding events to timeline 131.253.33.254:443->10.2.17.101:49729
+Adding events to timeline 131.253.33.254:443->10.2.17.101:49729
+Adding events to timeline 10.2.17.101:49729->131.253.33.254:443
+Note added
+Events added
+```
+
 #### iris_get_from_ts_savedsearch_byid.py
+
+Get the events from a saved search in TimeSketch and import as events for the timeline feature of IRIS. Search the saved search by **id**.
+
 * Get timeline events from a TimeSketch saved search (by id)
+
+```
+(timesketch_api) user@timesketch:~/demo/scripts$ python iris_get_from_ts_savedsearch_byid.py -h
+usage: iris_get_from_ts_savedsearch_byid.py [-h] sketch_id savedsearch_id return_fields cid
+
+Fetch events based on a saved search (ID-based) from TimeSketch and import into case
+
+positional arguments:
+  sketch_id       TimeSketch ID
+  savedsearch_id  TimeSketch saved search ID
+  return_fields   TimeSketch Fields to return
+  cid             IRIS Case ID
+
+optional arguments:
+  -h, --help      show this help message and exit
+```
+
 
 ### TimeSketch
 
@@ -358,9 +451,6 @@ optional arguments:
 (timesketch_api) user@timesketch:~/demo/scripts$ python ts_ioc_iris_savedsearch.py 15 'src_ip, dst_ip, url' 12
 Save search for 64.188.19.241 added
 ```
-
-
-
 
 
 # Elastic
