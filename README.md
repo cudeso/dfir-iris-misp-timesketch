@@ -33,7 +33,7 @@ Also have a look at [Incident response case management, DFIR-IRIS and a bit of M
 
 * Enter Python virtual environment
 * * See [pip-venv-list.txt](pip-venv-list.txt)
-* `source timesketch_api/bin/activate``
+* `source timesketch_api/bin/activate`
 
 ### IRIS
 
@@ -65,6 +65,8 @@ Case 12 created
 * Adds a global task
 
 ![iris-create_case.jpg](iris-create_case.jpg)
+
+![iris-create_case2.jpg](iris-create_case2.jpg)
 
 The list of tasks comes from TheHive template, such as for example the file [thehive.json](thehive.json)
 
@@ -209,10 +211,13 @@ optional arguments:
 
 Get the events from a saved search in TimeSketch and import as events for the timeline feature of IRIS. Search the saved search by **name**.
 
+The script also adds the results as a seperate IRIS note.
+
 ![iris_get_from_ts2.jpg](iris_get_from_ts2.jpg)
 
 ![iris_get_from_ts1.jpg](iris_get_from_ts1.jpg)
 
+![iris_get_from_ts3.jpg](iris_get_from_ts3.jpg)
 
 * Get timeline events from a Timesketch saved search
 
@@ -264,6 +269,8 @@ Events added
 #### iris_get_from_ts_savedsearch_byid.py
 
 Get the events from a saved search in TimeSketch and import as events for the timeline feature of IRIS. Search the saved search by **id**.
+
+The script also adds the results as a seperate IRIS note.
 
 * Get timeline events from a TimeSketch saved search (by id)
 
