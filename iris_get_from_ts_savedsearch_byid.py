@@ -84,7 +84,7 @@ def add_evidence(cid, evidence, label, default_return_fields):
             result = requests.post("{}/case/timeline/events/add".format(iris_host), headers=iris_headers, data=iris_data, verify=iris_verify)
             #print(result.text)
             print("Adding events to timeline {}".format(ev["_source"]["message"]))
-        #add_notes_helper(cid, "Evidences", label, note_evidence )
+        add_notes_helper(cid, "Evidences", label, note_evidence )
         print("Note added")
 
 
@@ -100,10 +100,8 @@ def main():
 
     default_return_fields = "message,datetime,timestamp,timestamp_desc,comment"
     result = ts_search_saved_search("byid", args.sketch_id, args.savedsearch_id, default_return_fields, args.return_fields)
-    print(result)
-    sys.exit()
     if result:
-        add_evidence(args.cid, result, args.savedsearch, default_return_fields)
+        add_evidence(args.cid, result, "From TS {}".format(args.savedsearch_id), default_return_fields)
         print("Events added")
 
 
